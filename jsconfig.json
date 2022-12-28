@@ -1,0 +1,9 @@
+{
+	"compilerOptions": {
+		"baseUrl": ".",
+		"paths": {
+			"@constants": ["src/constants/index.js"],
+			"@atoms": ["src/atoms/index.js"]
+		}
+	}
+}

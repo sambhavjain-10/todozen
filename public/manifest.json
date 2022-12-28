@@ -1,0 +1,20 @@
+{
+	"name": "Todo's",
+	"description": "Todo's extension",
+	"version": "1.0",
+	"manifest_version": 3,
+	"action": {
+		"default_popup": "index.html",
+		"default_title": "Todo's"
+	},
+	"background": {
+		"service_worker": "background.js"
+	},
+	"host_permissions": ["https://www.linkedin.com/*"],
+	"permissions": ["tabs", "storage", "cookies"],
+	"icons": {
+		"16": "vite.svg",
+		"48": "vite.svg",
+		"128": "vite.svg"
+	}
+}
