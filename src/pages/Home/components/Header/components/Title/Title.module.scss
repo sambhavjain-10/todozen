@@ -1,0 +1,5 @@
+.title {
+	& > span {
+		user-select: none;
+	}
+}

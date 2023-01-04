@@ -9,7 +9,8 @@ const active = atom({
 	key: "active",
 	default: {
 		page: "home",
-		category: "Todo's",
+		category: "",
+		search: "",
 	},
 	effects_UNSTABLE: [persistAtom],
 });

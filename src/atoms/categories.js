@@ -9,6 +9,7 @@ const categories = atom({
 	key: "categories",
 	default: [
 		{
+			id: crypto.randomUUID(),
 			name: "Todo's",
 			background: "#189ad6",
 		},

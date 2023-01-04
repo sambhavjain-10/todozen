@@ -1,11 +1,13 @@
 import Header from "./components/Header/Header";
-import Overview from "./components/Overview/Overview";
+import Categories from "./components/Categories/Categories";
+import Todos from "./components/Todos/Todos";
 
 const Home = () => {
 	return (
 		<>
 			<Header />
-			<Overview />
+			<Categories />
+			<Todos />
 		</>
 	);
 };

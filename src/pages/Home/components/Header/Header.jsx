@@ -2,35 +2,21 @@ import { activeAtom, settingsAtom } from "@atoms";
 import { PAGES } from "@constants";
 import { useEffect, useState } from "react";
 import { useRecoilState, useSetRecoilState } from "recoil";
+import Title from "./components/Title/Title";
 import styles from "./Header.module.scss";
 
 const Header = () => {
 	const setActive = useSetRecoilState(activeAtom);
-	const [settings, setSettings] = useRecoilState(settingsAtom);
-
-	const [editTitle, setEditTitle] = useState(false);
-
-	useEffect(() => {
-		if (editTitle) {
-		}
-	}, [editTitle]);
 
 	return (
 		<div className={styles.header}>
-			<div>
-				{editTitle ? (
-					<input
-						value={settings.title}
-						onChange={e => setSettings(prev => ({ ...prev, title: e.target.value }))}
-						onBlur={() => setEditTitle(false)}
-					/>
-				) : (
-					<span onDoubleClick={() => setEditTitle(true)}>{settings.title}</span>
-				)}
-			</div>
-			<button onClick={() => setActive(prev => ({ ...prev, page: PAGES.SETTINGS }))}>
+			<div className={styles.container}>
+				<Title />
+				{/* <button onClick={() => setActive(prev => ({ ...prev, page: PAGES.SETTINGS }))}>
 				Settings
-			</button>
+			</button> */}
+			</div>
+			<div className={styles.divider} />
 		</div>
 	);
 };
