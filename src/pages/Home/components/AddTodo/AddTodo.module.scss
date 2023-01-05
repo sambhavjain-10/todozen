@@ -1,0 +1,13 @@
+.container {
+	padding: 15px;
+	width: 100%;
+	position: absolute;
+	left: 0;
+	bottom: 0;
+	display: flex;
+	textarea {
+		resize: none;
+		min-width: 100%;
+		max-width: 100%;
+	}
+}

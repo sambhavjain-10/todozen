@@ -24,7 +24,7 @@ const App = () => {
 		<div
 			className={styles.container}
 			style={{
-				background: settings.background,
+				// background: settings.background,
 				color: settings.color,
 				width: settings.width,
 				height: settings.height,
