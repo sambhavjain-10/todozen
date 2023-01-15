@@ -1,6 +1,7 @@
 import { activeAtom, todosAtom } from "@atoms";
 import { useEffect, useState } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
+import { Droppable, Draggable } from "react-beautiful-dnd";
 import Todo from "./Todo/Todo";
 import styles from "./Todos.module.scss";
 
@@ -16,15 +17,21 @@ const Todos = () => {
 
 	return (
 		<div className={styles.container}>
-			{todos
-				.filter(todo => todo.category === category)
-				.sort((a, b) => {
-					if (a.checked) return 1;
-					else if (!a.checked) return -1;
-				})
-				.map(todo => (
-					<Todo key={todo.id} todo={todo} showDelete={showDelete} />
-				))}
+			<Droppable droppableId="todos">
+				{provided => (
+					<div ref={provided.innerRef} {...provided.droppableProps}>
+						{todos[category]?.map((todo, index) => (
+							<Draggable key={todo.id} draggableId={todo.id} index={index}>
+								{provided => (
+									<div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+										<Todo key={todo.id} todo={todo} showDelete={showDelete} />
+									</div>
+								)}
+							</Draggable>
+						))}
+					</div>
+				)}
+			</Droppable>
 		</div>
 	);
 };

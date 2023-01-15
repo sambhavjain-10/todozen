@@ -1,7 +1,7 @@
 import { activeAtom, todosAtom } from "@atoms";
 import { Input } from "@components";
 import { useEffect, useRef, useState } from "react";
-import { useRecoilValue, useSetRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import styles from "./AddTodo.module.scss";
 
 const defaultTodo = () => ({
@@ -31,10 +31,10 @@ const AddTodo = () => {
 		if (!value.trim().length) return;
 		const newTodo = defaultTodo();
 		newTodo.title = value;
-		newTodo.category = category;
-		setTodos(prev => [newTodo, ...prev]);
+		setTodos(prev => ({ ...prev, [category]: [newTodo, ...(prev[category] || [])] }));
 		setValue("");
 	};
+
 	return (
 		<div className={styles.container}>
 			<Input

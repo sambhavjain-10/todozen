@@ -7,7 +7,7 @@ const { persistAtom } = recoilPersist({
 
 const todos = atom({
 	key: "todos",
-	default: [],
+	default: {},
 	effects_UNSTABLE: [persistAtom],
 });
 

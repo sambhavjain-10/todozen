@@ -5,6 +5,7 @@ import { getRandomColor, getTextColor } from "@utils";
 import { useRef, useState } from "react";
 import { useRecoilState } from "recoil";
 import styles from "./Categories.module.scss";
+import { Droppable, Draggable } from "react-beautiful-dnd";
 
 const dummyCategory = () => ({
 	id: crypto.randomUUID(),
@@ -64,56 +65,71 @@ const Categories = () => {
 	return (
 		<div className={styles.container}>
 			<div className={styles.title}>Categories</div>
-			<div className={styles.categories}>
-				{categories.map(cat => (
-					<span
-						key={cat.id}
-						style={{ background: cat.background, color: getTextColor(cat.background) }}
-						className={`${styles.category} ${active.category === cat.id ? styles.active : ""}`}
-						onClick={() => onCategoryClick(cat.id)}
-						onDoubleClick={() => onEditCategory(cat)}
-						onBlur={onEditBlur}
-					>
-						{isEdit === cat.id ? (
-							<Input
-								theme={InputThemes.TRANSPARENT}
-								value={tempCategory.name}
-								setValue={val => setCategoryName(val)}
-								style={{ color: getTextColor(tempCategory.background) }}
-								height="fit-content"
-								onKeyDown={e => e.key === "Enter" && onEditBlur()}
-								ref={inputRef}
-							/>
+			<Droppable droppableId="categories" direction="horizontal">
+				{(provided, snapshot) => (
+					<div ref={provided.innerRef} {...provided.droppableProps} className={styles.categories}>
+						{categories.map((cat, index) => (
+							<Draggable key={cat.id} draggableId={cat.id} index={index}>
+								{provided => (
+									<div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+										<Droppable droppableId={JSON.stringify({ type: "category", id: cat.id })}>
+											{provided => (
+												<div ref={provided.innerRef} {...provided.droppableProps} className={styles.categories}>
+													<span
+														style={{ background: cat.background, color: getTextColor(cat.background) }}
+														className={`${styles.category} ${active.category === cat.id ? styles.active : ""}`}
+														onClick={() => onCategoryClick(cat.id)}
+														onDoubleClick={() => onEditCategory(cat)}
+														onBlur={onEditBlur}
+													>
+														{isEdit === cat.id ? (
+															<Input
+																theme={InputThemes.TRANSPARENT}
+																value={tempCategory.name}
+																setValue={val => setCategoryName(val)}
+																style={{ color: getTextColor(tempCategory.background) }}
+																height="fit-content"
+																onKeyDown={e => e.key === "Enter" && onEditBlur()}
+																ref={inputRef}
+															/>
+														) : (
+															cat.name
+														)}
+														<button className={styles.deleteBtn} onClick={() => onDelete(cat.id)}>
+															x
+														</button>
+													</span>
+												</div>
+											)}
+										</Droppable>
+									</div>
+								)}
+							</Draggable>
+						))}
+						{isAdd ? (
+							<span
+								style={{
+									background: tempCategory.background,
+									color: getTextColor(tempCategory.background),
+								}}
+								className={styles.category}
+							>
+								<Input
+									theme={InputThemes.TRANSPARENT}
+									value={tempCategory.name}
+									setValue={val => setCategoryName(val)}
+									onBlur={onAddBlur}
+									style={{ color: getTextColor(tempCategory.background) }}
+									height="fit-content"
+									width="fit-content"
+								/>
+							</span>
 						) : (
-							cat.name
+							<button onClick={onAddNewCategory}>+</button>
 						)}
-						<button className={styles.deleteBtn} onClick={() => onDelete(cat.id)}>
-							x
-						</button>
-					</span>
-				))}
-				{isAdd ? (
-					<span
-						style={{
-							background: tempCategory.background,
-							color: getTextColor(tempCategory.background),
-						}}
-						className={styles.category}
-					>
-						<Input
-							theme={InputThemes.TRANSPARENT}
-							value={tempCategory.name}
-							setValue={val => setCategoryName(val)}
-							onBlur={onAddBlur}
-							style={{ color: getTextColor(tempCategory.background) }}
-							height="fit-content"
-							width="fit-content"
-						/>
-					</span>
-				) : (
-					<button onClick={onAddNewCategory}>+</button>
+					</div>
 				)}
-			</div>
+			</Droppable>
 		</div>
 	);
 };
