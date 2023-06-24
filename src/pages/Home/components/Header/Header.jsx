@@ -12,9 +12,7 @@ const Header = () => {
 		<div className={styles.header}>
 			<div className={styles.container}>
 				<Title />
-				{/* <button onClick={() => setActive(prev => ({ ...prev, page: PAGES.SETTINGS }))}>
-				Settings
-			</button> */}
+				<button onClick={() => setActive(prev => ({ ...prev, page: PAGES.SETTINGS }))}>Settings</button>
 			</div>
 			<div className={styles.divider} />
 		</div>

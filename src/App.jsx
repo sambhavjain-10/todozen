@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import { activeAtom, settingsAtom } from "@atoms";
 import { PAGES } from "@constants";
 import { useRecoilValue } from "recoil";

@@ -1,16 +1,13 @@
 {
-	"name": "Todo's",
+	"name": "TodoZen",
 	"description": "Todo's extension",
 	"version": "1.0",
 	"manifest_version": 3,
 	"action": {
 		"default_popup": "index.html",
-		"default_title": "Todo's"
+		"default_title": "TodoZen"
 	},
-	"background": {
-		"service_worker": "background.js"
-	},
-	"host_permissions": ["https://www.linkedin.com/*"],
+	"host_permissions": ["http://localhost:5173/*"],
 	"permissions": ["tabs", "storage", "cookies"],
 	"icons": {
 		"16": "vite.svg",

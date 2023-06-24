@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Authorize TodoZen</title>
+		<script>
+			let token = window.location.href.split("token=")[1];
+			if (token) {
+				const expirationDate = new Date(Date.now() + 60 * 60 * 1000); // 1 hour from now
+				document.cookie = `todozen_token=${token}; expires=${expirationDate.toUTCString()}; path=/`;
+			}
+		</script>
+	</head>
+	<body style="display: flex; flex-direction: column; justify-content: center; align-items: center">
+		<h1>Authorize Todo's extension</h1>
+		<h3>To complete authorization, open TodoZen</h3>
+	</body>
+</html>
