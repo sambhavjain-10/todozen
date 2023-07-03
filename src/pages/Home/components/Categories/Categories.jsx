@@ -1,11 +1,11 @@
-import { activeAtom, categoriesAtom } from "@atoms";
+import { activeAtom, categoriesAtom, todosAtom } from "@atoms";
 import { Input } from "@components";
 import { InputThemes } from "@themes";
 import { getRandomColor, getTextColor } from "@utils";
 import { useRef, useState } from "react";
-import { useRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import styles from "./Categories.module.scss";
-import { Droppable, Draggable } from "react-beautiful-dnd";
+import { Droppable } from "react-beautiful-dnd";
 
 const dummyCategory = () => ({
 	id: crypto.randomUUID(),
@@ -17,6 +17,7 @@ const Categories = () => {
 	const inputRef = useRef(null);
 	//atom states
 	const [categories, setCategories] = useRecoilState(categoriesAtom);
+	const [todos, setTodos] = useRecoilState(todosAtom);
 	const [active, setActive] = useRecoilState(activeAtom);
 
 	//inner states
@@ -37,6 +38,10 @@ const Categories = () => {
 
 	const onAddBlur = () => {
 		setCategories(prev => [...prev, tempCategory]);
+		setTodos(prev => ({
+			...prev,
+			[tempCategory.id]: [],
+		}));
 		setIsAdd(false);
 	};
 
@@ -64,72 +69,72 @@ const Categories = () => {
 
 	return (
 		<div className={styles.container}>
-			<div className={styles.title}>Categories</div>
-			<Droppable droppableId="categories" direction="horizontal">
-				{(provided, snapshot) => (
-					<div ref={provided.innerRef} {...provided.droppableProps} className={styles.categories}>
-						{categories.map((cat, index) => (
-							<Draggable key={cat.id} draggableId={cat.id} index={index}>
-								{provided => (
-									<div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-										<Droppable droppableId={JSON.stringify({ type: "category", id: cat.id })}>
-											{provided => (
-												<div ref={provided.innerRef} {...provided.droppableProps} className={styles.categories}>
-													<span
-														style={{ background: cat.background, color: getTextColor(cat.background) }}
-														className={`${styles.category} ${active.category === cat.id ? styles.active : ""}`}
-														onClick={() => onCategoryClick(cat.id)}
-														onDoubleClick={() => onEditCategory(cat)}
-														onBlur={onEditBlur}
-													>
-														{isEdit === cat.id ? (
-															<Input
-																theme={InputThemes.TRANSPARENT}
-																value={tempCategory.name}
-																setValue={val => setCategoryName(val)}
-																style={{ color: getTextColor(tempCategory.background) }}
-																height="fit-content"
-																onKeyDown={e => e.key === "Enter" && onEditBlur()}
-																ref={inputRef}
-															/>
-														) : (
-															cat.name
-														)}
-														<button className={styles.deleteBtn} onClick={() => onDelete(cat.id)}>
-															x
-														</button>
-													</span>
-												</div>
-											)}
-										</Droppable>
-									</div>
-								)}
-							</Draggable>
-						))}
-						{isAdd ? (
-							<span
-								style={{
-									background: tempCategory.background,
-									color: getTextColor(tempCategory.background),
-								}}
-								className={styles.category}
-							>
-								<Input
-									theme={InputThemes.TRANSPARENT}
-									value={tempCategory.name}
-									setValue={val => setCategoryName(val)}
-									onBlur={onAddBlur}
-									style={{ color: getTextColor(tempCategory.background) }}
-									height="fit-content"
-									width="fit-content"
-								/>
-							</span>
-						) : (
-							<button onClick={onAddNewCategory}>+</button>
+			<div className={styles.categories}>
+				{categories.map(cat => (
+					<Droppable droppableId={JSON.stringify({ type: "category", id: cat.id })} key={cat.id}>
+						{provided => (
+							<div ref={provided.innerRef} {...provided.droppableProps} className={styles.categories}>
+								<span
+									style={{ borderColor: cat.background, ...(active.category === cat.id && { background: cat.background }) }}
+									className={`${styles.category} ${active.category === cat.id ? styles.active : ""}`}
+									onClick={() => onCategoryClick(cat.id)}
+									onDoubleClick={() => onEditCategory(cat)}
+									onBlur={onEditBlur}
+								>
+									{isEdit === cat.id ? (
+										<Input
+											theme={InputThemes.TRANSPARENT}
+											value={tempCategory.name}
+											setValue={val => setCategoryName(val)}
+											style={{ color: getTextColor(tempCategory.background) }}
+											height="fit-content"
+											onKeyDown={e => e.key === "Enter" && onEditBlur()}
+											ref={inputRef}
+										/>
+									) : (
+										<div className={styles.info}>
+											<span className={styles.name} style={{ color: cat.background }}>
+												{cat.name}
+											</span>
+											<span
+												className={styles.count}
+												style={{ background: cat.background, ...(active.category === cat.id && { color: cat.background }) }}
+											>
+												{todos[cat.id]?.length ?? 0}
+											</span>
+										</div>
+									)}
+									<button className={styles.deleteBtn} onClick={() => onDelete(cat.id)}>
+										x
+									</button>
+								</span>
+								{provided.placeholder}
+							</div>
 						)}
-					</div>
+					</Droppable>
+				))}
+				{isAdd ? (
+					<span
+						style={{
+							background: tempCategory.background,
+							color: getTextColor(tempCategory.background),
+						}}
+						className={styles.category}
+					>
+						<Input
+							theme={InputThemes.TRANSPARENT}
+							value={tempCategory.name}
+							setValue={val => setCategoryName(val)}
+							onBlur={onAddBlur}
+							style={{ color: getTextColor(tempCategory.background) }}
+							height="fit-content"
+							width="fit-content"
+						/>
+					</span>
+				) : (
+					<button onClick={onAddNewCategory}>+</button>
 				)}
-			</Droppable>
+			</div>
 		</div>
 	);
 };

@@ -5,6 +5,7 @@ import { useRecoilValue } from "recoil";
 import Home from "./pages/Home/Home";
 import Settings from "./pages/Settings/Settings";
 import styles from "./App.module.scss";
+import Nav from "./pages/Home/components/Nav/Nav";
 
 const App = () => {
 	const page = useRecoilValue(activeAtom).page;
@@ -32,6 +33,7 @@ const App = () => {
 			}}
 		>
 			{renderPage()}
+			<Nav />
 		</div>
 	);
 };

@@ -10,14 +10,21 @@ const Todos = () => {
 	const category = useRecoilValue(activeAtom).category;
 	const [showDelete, setshowDelete] = useState(false);
 
-	useEffect(() => {
-		window.addEventListener("keydown", e => e.key === "Shift" && setshowDelete(true));
-		window.addEventListener("keyup", e => e.key === "Shift" && setshowDelete(false));
-	}, []);
-
 	return (
 		<div className={styles.container}>
-			<Droppable droppableId="todos">
+			<Droppable
+				droppableId="todos"
+				mode="virtual"
+				renderClone={(provided, snapshot, rubric) => (
+					<div {...provided.draggableProps} {...provided.dragHandleProps} ref={provided.innerRef}>
+						<Todo
+							key={todos[category][rubric.source.index].id}
+							todo={todos[category][rubric.source.index]}
+							showDelete={showDelete}
+						/>
+					</div>
+				)}
+			>
 				{provided => (
 					<div ref={provided.innerRef} {...provided.droppableProps}>
 						{todos[category]?.map((todo, index) => (

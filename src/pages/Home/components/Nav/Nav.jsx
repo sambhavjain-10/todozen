@@ -2,7 +2,8 @@ import { activeAtom, todosAtom } from "@atoms";
 import { Input } from "@components";
 import { useEffect, useRef, useState } from "react";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
-import styles from "./AddTodo.module.scss";
+import styles from "./Nav.module.scss";
+import { PAGES } from "@constants";
 
 const defaultTodo = () => ({
 	id: crypto.randomUUID(),
@@ -13,12 +14,14 @@ const defaultTodo = () => ({
 	tags: [],
 });
 
-const AddTodo = () => {
+const Nav = () => {
+	const [active, setActive] = useRecoilState(activeAtom);
 	const inputRef = useRef(null);
 
 	const setTodos = useSetRecoilState(todosAtom);
 	const category = useRecoilValue(activeAtom).category;
 	const [value, setValue] = useState("");
+	const [isAdd, setIsAdd] = useState(false);
 
 	useEffect(() => {
 		if (inputRef.current) {
@@ -35,18 +38,37 @@ const AddTodo = () => {
 		setValue("");
 	};
 
+	const onLinkClick = page => {
+		setActive(prev => ({ ...prev, page }));
+	};
+
 	return (
 		<div className={styles.container}>
-			<Input
-				type="textarea"
-				value={value}
-				setValue={setValue}
-				onKeyDown={e => e.key === "Enter" && !e.shiftKey && onAdd()}
-				ref={inputRef}
-			/>
-			<button onClick={onAdd}>+</button>
+			{isAdd ? (
+				<div className={styles.addTodo}>
+					<Input
+						type="textarea"
+						value={value}
+						setValue={setValue}
+						onKeyDown={e => {
+							e.preventDefault();
+							e.key === "Enter" && !e.shiftKey && onAdd();
+						}}
+						ref={inputRef}
+						onBlur={() => setIsAdd(false)}
+					/>
+				</div>
+			) : (
+				<div className={styles.addTodo} onClick={() => setIsAdd(true)}>
+					+
+				</div>
+			)}
+			<div className={styles.links}>
+				<button onClick={() => onLinkClick(PAGES.HOME)}>H</button>
+				<button onClick={() => onLinkClick(PAGES.SETTINGS)}>S</button>
+			</div>
 		</div>
 	);
 };
 
-export default AddTodo;
+export default Nav;

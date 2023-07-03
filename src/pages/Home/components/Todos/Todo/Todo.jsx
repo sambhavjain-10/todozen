@@ -1,16 +1,23 @@
-import { todosAtom } from "@atoms";
+import { activeAtom, todosAtom } from "@atoms";
 import { Input } from "@components";
 import { InputThemes } from "@themes";
 import { useEffect, useRef, useState } from "react";
-import { useSetRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import styles from "./Todo.module.scss";
 
 const Todo = ({ todo, showDelete }) => {
 	const inputRef = useRef(null);
 	const setTodos = useSetRecoilState(todosAtom);
+	const active = useRecoilValue(activeAtom);
 
 	const [isEdit, setIsEdit] = useState(false);
 	const [tempTodo, setTempTodo] = useState({});
+	const [showMore, setShowMore] = useState(false);
+
+	useEffect(() => {
+		window.addEventListener("keydown", e => e.key === "Shift" && setShowMore(true));
+		window.addEventListener("keyup", e => e.key === "Shift" && setShowMore(false));
+	}, []);
 
 	useEffect(() => {
 		if (inputRef.current) {
@@ -19,39 +26,41 @@ const Todo = ({ todo, showDelete }) => {
 		}
 	}, [tempTodo, inputRef, isEdit]);
 
-	const onEditTodo = cat => {
-		setIsEdit(cat.id);
-		setTempTodo(cat);
+	const onEditTodo = todo => {
+		setIsEdit(todo.id);
+		setTempTodo(todo);
 		setTimeout(() => {
 			inputRef.current.focus();
 		}, 100);
 	};
 
 	const onEditBlur = () => {
-		setTodos(prev =>
-			prev.map(todo => {
+		setTodos(prev => ({
+			...prev,
+			[active.category]: prev[active.category].map(todo => {
 				if (todo.id === tempTodo.id) return tempTodo;
 				return todo;
-			})
-		);
+			}),
+		}));
 		setIsEdit(false);
 	};
 
 	const setTodoTitle = val => setTempTodo(prev => ({ ...prev, title: val }));
 
-	const onDelete = id => setTodos(prev => prev.filter(todo => todo.id !== id));
+	const onDelete = id => setTodos(prev => ({ ...prev, [active.category]: prev[active.category].filter(todo => todo.id !== id) }));
 
 	const onCheckboxChange = () => {
-		setTodos(prev =>
-			prev.map(orgTodo => {
+		setTodos(prev => ({
+			...prev,
+			[active.category]: prev[active.category].map(orgTodo => {
 				if (orgTodo.id === todo.id) return { ...orgTodo, checked: !orgTodo.checked };
 				return orgTodo;
-			})
-		);
+			}),
+		}));
 	};
 
 	return (
-		<div className={`${styles.container} ${todo.checked ? styles.checked : ""}`}>
+		<div className={`${styles.container} ${todo.checked ? styles.checked : ""} ${showMore ? styles.showMore : ""}`}>
 			<div className={styles.checkbox}>
 				<input type="checkbox" checked={todo.checked} onChange={onCheckboxChange} />
 			</div>
@@ -70,8 +79,8 @@ const Todo = ({ todo, showDelete }) => {
 					<span>{todo.title}</span>
 				)}
 			</div>
-			<div className={styles.deleteBtn} onClick={() => showDelete && onDelete(todo.id)}>
-				{showDelete && "x"}
+			<div className={styles.deleteBtn} onClick={() => onDelete(todo.id)}>
+				x
 			</div>
 		</div>
 	);

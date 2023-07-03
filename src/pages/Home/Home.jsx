@@ -1,11 +1,11 @@
-import Header from "./components/Header/Header";
 import Categories from "./components/Categories/Categories";
 import Todos from "./components/Todos/Todos";
-import AddTodo from "./components/AddTodo/AddTodo";
 import { DragDropContext } from "react-beautiful-dnd";
 import { useCallback } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { activeAtom, categoriesAtom, todosAtom } from "@atoms";
+import Title from "./components/Title/Title";
+import Nav from "./components/Nav/Nav";
 
 const Home = () => {
 	const [todos, setTodos] = useRecoilState(todosAtom);
@@ -15,9 +15,8 @@ const Home = () => {
 	const onDragEnd = useCallback(
 		e => {
 			console.log(e);
-			const { source, destination } = e;
-			//categories => todos
-			if (source.droppableId === "categories" && destination.droppableId === "todos") return;
+			const { draggableId, source, destination } = e;
+			if (!destination) return;
 			//todos => todos
 			if (source.droppableId === "todos" && source.droppableId === destination.droppableId) {
 				setTodos(prev => {
@@ -25,29 +24,36 @@ const Home = () => {
 					newArr.splice(destination.index, 0, newArr.splice(source.index, 1)[0]);
 					return { ...prev, [category]: newArr };
 				});
-			}
-			//categories => categories
-			if (source.droppableId === "categories" && source.droppableId === destination.droppableId) {
-				setCategories(prev => {
-					let newArr = [...prev];
-					newArr.splice(destination.index, 0, newArr.splice(source.index, 1)[0]);
-					return newArr;
-				});
+				return;
 			}
 			//todos => categories
-			if (source.droppableId === "todos" && destination.droppableId === "categories") return;
+			if (
+				source.droppableId === "todos" &&
+				JSON.parse(destination.droppableId).type === "category" &&
+				category !== JSON.parse(destination.droppableId).id
+			) {
+				const newCategoryId = JSON.parse(destination.droppableId).id;
+				setTodos(prev => {
+					let todo = prev[category].find(todo => todo.id === draggableId);
+					return {
+						...prev,
+						[category]: prev[category].filter(todo => todo.id !== draggableId),
+						[newCategoryId]: [todo, ...prev[newCategoryId]],
+					};
+				});
+				return;
+			}
 		},
 		[category]
 	);
 
 	return (
 		<>
-			<Header />
+			<Title />
 			<DragDropContext onDragEnd={onDragEnd}>
 				<Categories />
 				<Todos />
 			</DragDropContext>
-			<AddTodo />
 		</>
 	);
 };

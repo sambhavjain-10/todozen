@@ -1,0 +1,13 @@
+@import "src/colors";
+
+.title {
+	& > span {
+		user-select: none;
+	}
+	& > span,
+	input {
+		font-weight: 600;
+		font-size: 1.78rem;
+		color: $darkBlue;
+	}
+}
