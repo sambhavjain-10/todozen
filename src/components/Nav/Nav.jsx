@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import styles from "./Nav.module.scss";
 import { PAGES } from "@constants";
+import { Home, Plus, Settings } from "@icons";
 
 const defaultTodo = () => ({
 	id: crypto.randomUUID(),
@@ -36,36 +37,51 @@ const Nav = () => {
 		newTodo.title = value;
 		setTodos(prev => ({ ...prev, [category]: [newTodo, ...(prev[category] || [])] }));
 		setValue("");
+		setIsAdd(false);
 	};
 
 	const onLinkClick = page => {
 		setActive(prev => ({ ...prev, page }));
 	};
 
+	useEffect(() => {
+		if (isAdd) setTimeout(() => inputRef.current.focus(), 300);
+	}, [isAdd]);
+
+	useEffect(() => {
+		window.addEventListener("keydown", e => e.key === "/" && setIsAdd(true));
+	}, []);
+
 	return (
 		<div className={styles.container}>
-			{isAdd ? (
-				<div className={styles.addTodo}>
+			<div
+				className={`${styles.addTodo} ${isAdd ? styles.isAdd : ""}`}
+				onClick={() => {
+					!isAdd && setIsAdd(true);
+				}}
+			>
+				{isAdd ? (
 					<Input
 						type="textarea"
 						value={value}
 						setValue={setValue}
-						onKeyDown={e => {
-							e.preventDefault();
-							e.key === "Enter" && !e.shiftKey && onAdd();
-						}}
+						onKeyDown={e => e.key === "Enter" && !e.shiftKey && onAdd()}
 						ref={inputRef}
 						onBlur={() => setIsAdd(false)}
 					/>
-				</div>
-			) : (
-				<div className={styles.addTodo} onClick={() => setIsAdd(true)}>
-					+
-				</div>
-			)}
+				) : (
+					<div className={styles.icon}>
+						<Plus />
+					</div>
+				)}
+			</div>
 			<div className={styles.links}>
-				<button onClick={() => onLinkClick(PAGES.HOME)}>H</button>
-				<button onClick={() => onLinkClick(PAGES.SETTINGS)}>S</button>
+				<button onClick={() => onLinkClick(PAGES.HOME)} className={active.page === PAGES.HOME ? styles.active : ""}>
+					<Home />
+				</button>
+				<button onClick={() => onLinkClick(PAGES.SETTINGS)} className={active.page === PAGES.SETTINGS ? styles.active : ""}>
+					<Settings />
+				</button>
 			</div>
 		</div>
 	);

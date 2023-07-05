@@ -12,7 +12,7 @@ const settings = atom({
 		//customisation
 		background: "#cfcfcf",
 		color: "black",
-		width: "800px",
+		width: "410px",
 		height: "600px",
 	},
 	effects_UNSTABLE: [persistAtom],

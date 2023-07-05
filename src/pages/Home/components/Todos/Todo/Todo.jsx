@@ -1,9 +1,10 @@
 import { activeAtom, todosAtom } from "@atoms";
-import { Input } from "@components";
+import { Checkbox, Input } from "@components";
 import { InputThemes } from "@themes";
 import { useEffect, useRef, useState } from "react";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import styles from "./Todo.module.scss";
+import { Delete, ThreeDot } from "@icons";
 
 const Todo = ({ todo, showDelete }) => {
 	const inputRef = useRef(null);
@@ -61,9 +62,7 @@ const Todo = ({ todo, showDelete }) => {
 
 	return (
 		<div className={`${styles.container} ${todo.checked ? styles.checked : ""} ${showMore ? styles.showMore : ""}`}>
-			<div className={styles.checkbox}>
-				<input type="checkbox" checked={todo.checked} onChange={onCheckboxChange} />
-			</div>
+			<Checkbox checked={todo.checked} onChange={onCheckboxChange} />
 			<div className={styles.text} onDoubleClick={() => onEditTodo(todo)} onBlur={onEditBlur}>
 				{isEdit === todo.id ? (
 					<Input
@@ -79,8 +78,11 @@ const Todo = ({ todo, showDelete }) => {
 					<span>{todo.title}</span>
 				)}
 			</div>
+			<div className={styles.options}>
+				<ThreeDot />
+			</div>
 			<div className={styles.deleteBtn} onClick={() => onDelete(todo.id)}>
-				x
+				<Delete size="1.2rem" />
 			</div>
 		</div>
 	);

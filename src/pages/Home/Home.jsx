@@ -5,7 +5,6 @@ import { useCallback } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { activeAtom, categoriesAtom, todosAtom } from "@atoms";
 import Title from "./components/Title/Title";
-import Nav from "./components/Nav/Nav";
 
 const Home = () => {
 	const [todos, setTodos] = useRecoilState(todosAtom);

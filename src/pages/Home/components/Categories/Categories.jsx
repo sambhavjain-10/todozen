@@ -6,6 +6,7 @@ import { useRef, useState } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
 import styles from "./Categories.module.scss";
 import { Droppable } from "react-beautiful-dnd";
+import { Delete, Plus } from "@icons";
 
 const dummyCategory = () => ({
 	id: crypto.randomUUID(),
@@ -15,6 +16,7 @@ const dummyCategory = () => ({
 
 const Categories = () => {
 	const inputRef = useRef(null);
+	const inputRef2 = useRef(null);
 	//atom states
 	const [categories, setCategories] = useRecoilState(categoriesAtom);
 	const [todos, setTodos] = useRecoilState(todosAtom);
@@ -34,6 +36,9 @@ const Categories = () => {
 	const onAddNewCategory = () => {
 		setIsAdd(true);
 		setTempCategory(dummyCategory());
+		setTimeout(() => {
+			inputRef2.current.focus();
+		}, 100);
 	};
 
 	const onAddBlur = () => {
@@ -43,6 +48,7 @@ const Categories = () => {
 			[tempCategory.id]: [],
 		}));
 		setIsAdd(false);
+		onCategoryClick(tempCategory.id);
 	};
 
 	const onEditCategory = cat => {
@@ -86,7 +92,10 @@ const Categories = () => {
 											theme={InputThemes.TRANSPARENT}
 											value={tempCategory.name}
 											setValue={val => setCategoryName(val)}
-											style={{ color: getTextColor(tempCategory.background) }}
+											style={{
+												color: getTextColor(tempCategory.background),
+												width: `calc(${tempCategory.name.length * 6}px + 20px)`,
+											}}
 											height="fit-content"
 											onKeyDown={e => e.key === "Enter" && onEditBlur()}
 											ref={inputRef}
@@ -105,7 +114,7 @@ const Categories = () => {
 										</div>
 									)}
 									<button className={styles.deleteBtn} onClick={() => onDelete(cat.id)}>
-										x
+										<Delete size="1rem" />
 									</button>
 								</span>
 								{provided.placeholder}
@@ -126,13 +135,20 @@ const Categories = () => {
 							value={tempCategory.name}
 							setValue={val => setCategoryName(val)}
 							onBlur={onAddBlur}
-							style={{ color: getTextColor(tempCategory.background) }}
+							onKeyDown={e => e.key === "Enter" && onAddBlur()}
+							style={{
+								color: getTextColor(tempCategory.background),
+								width: `calc(${tempCategory.name.length * 6}px + 20px)`,
+							}}
 							height="fit-content"
 							width="fit-content"
+							ref={inputRef2}
 						/>
 					</span>
 				) : (
-					<button onClick={onAddNewCategory}>+</button>
+					<button onClick={onAddNewCategory} className={styles.addBtn}>
+						<Plus size="1.2rem" />
+					</button>
 				)}
 			</div>
 		</div>
