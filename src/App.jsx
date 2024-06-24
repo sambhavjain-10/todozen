@@ -2,10 +2,11 @@
 import { activeAtom, settingsAtom } from "@atoms";
 import { PAGES } from "@constants";
 import { useRecoilValue } from "recoil";
+import styles from "./App.module.scss";
+import { AlertProvider } from "./contexts";
 import Home from "./pages/Home/Home";
 import Settings from "./pages/Settings/Settings";
-import styles from "./App.module.scss";
-import { Nav } from "@components";
+import AlertStack from "./components/AlertStack/AlertStack";
 
 const App = () => {
 	const page = useRecoilValue(activeAtom).page;
@@ -23,18 +24,20 @@ const App = () => {
 	};
 
 	return (
-		<div
-			className={styles.container}
-			style={{
-				// background: settings.background,
-				color: settings.color,
-				width: settings.width,
-				height: settings.height,
-			}}
-		>
-			{renderPage()}
-			<Nav />
-		</div>
+		<AlertProvider>
+			<AlertStack />
+			<div
+				className={styles.container}
+				style={{
+					background: settings.theme?.background,
+					color: settings.theme?.primaryColor,
+					width: settings.width,
+					height: settings.height,
+				}}
+			>
+				{renderPage()}
+			</div>
+		</AlertProvider>
 	);
 };
 

@@ -1,6 +1,5 @@
 /* Modal z-index is 10000 */
-
-@import "styles/variables.scss";
+@import "src/colors";
 
 * {
 	margin: 0;
@@ -72,7 +71,7 @@ input::-webkit-inner-spin-button {
 
 *::-webkit-scrollbar-thumb {
 	border-radius: 3px;
-	background: $primaryGradient;
+	background: $grey;
 }
 
 @media (prefers-color-scheme: light) {

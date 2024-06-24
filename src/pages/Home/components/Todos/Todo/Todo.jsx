@@ -2,11 +2,11 @@ import { activeAtom, todosAtom } from "@atoms";
 import { Checkbox, Input } from "@components";
 import { InputThemes } from "@themes";
 import { useEffect, useRef, useState } from "react";
-import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 import styles from "./Todo.module.scss";
 import { Delete, ThreeDot } from "@icons";
 
-const Todo = ({ todo, showDelete }) => {
+const Todo = ({ todo }) => {
 	const inputRef = useRef(null);
 	const setTodos = useSetRecoilState(todosAtom);
 	const active = useRecoilValue(activeAtom);
@@ -14,6 +14,7 @@ const Todo = ({ todo, showDelete }) => {
 	const [isEdit, setIsEdit] = useState(false);
 	const [tempTodo, setTempTodo] = useState({});
 	const [showMore, setShowMore] = useState(false);
+	const [showOptions, setShowOptions] = useState(false);
 
 	useEffect(() => {
 		window.addEventListener("keydown", e => e.key === "Shift" && setShowMore(true));
@@ -61,7 +62,10 @@ const Todo = ({ todo, showDelete }) => {
 	};
 
 	return (
-		<div className={`${styles.container} ${todo.checked ? styles.checked : ""} ${showMore ? styles.showMore : ""}`}>
+		<div
+			className={`${styles.container} ${todo.checked ? styles.checked : ""} ${showMore ? styles.showMore : ""}`}
+			onMouseLeave={() => setShowOptions(false)}
+		>
 			<Checkbox checked={todo.checked} onChange={onCheckboxChange} />
 			<div className={styles.text} onDoubleClick={() => onEditTodo(todo)} onBlur={onEditBlur}>
 				{isEdit === todo.id ? (
@@ -78,8 +82,13 @@ const Todo = ({ todo, showDelete }) => {
 					<span>{todo.title}</span>
 				)}
 			</div>
-			<div className={styles.options}>
-				<ThreeDot />
+			<div className={styles.moreBtn}>
+				<ThreeDot onClick={() => setShowOptions(todo.id)} />
+				<div className={`${styles.options} ${showOptions === todo.id ? styles.visible : ""}`}>
+					<button onClick={() => onDelete(todo.id)}>
+						<Delete color="red" size="1.2rem" /> Delete
+					</button>
+				</div>
 			</div>
 			<div className={styles.deleteBtn} onClick={() => onDelete(todo.id)}>
 				<Delete size="1.2rem" />

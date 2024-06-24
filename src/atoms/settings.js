@@ -9,9 +9,12 @@ const settings = atom({
 	key: "settings",
 	default: {
 		title: "Todo's",
-		//customisation
-		background: "#cfcfcf",
-		color: "black",
+		theme: {
+			background: "#cfcfcf",
+			primaryColor: "#000",
+			titleColor: "#000",
+			todoColor: "#000",
+		},
 		width: "410px",
 		height: "600px",
 	},

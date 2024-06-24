@@ -7,11 +7,9 @@
 		"default_popup": "index.html",
 		"default_title": "TodoZen"
 	},
-	"host_permissions": ["http://localhost:5173/*"],
-	"permissions": ["tabs", "storage", "cookies"],
 	"icons": {
-		"16": "vite.svg",
-		"48": "vite.svg",
-		"128": "vite.svg"
+		"16": "logo.png",
+		"48": "logo.png",
+		"128": "logo.png"
 	}
 }

@@ -1,6 +1,5 @@
 import { forwardRef } from "react";
-import InputMultiple from "./components/InputMultiple";
-import InputSingle from "./components/InputSingle";
+import styles from "./Input.module.scss";
 
 /**
  * This component is used to take input from user.
@@ -20,15 +19,59 @@ import InputSingle from "./components/InputSingle";
  * )
  */
 
-const Input = ({ value, ...rest }, ref) => {
-	const checkObject =
-		typeof value === "object" && !Array.isArray(value) && value !== null;
+const Input = forwardRef(
+	({ type, value, setValue, name, width = "100%", height = "40px", className, theme = "WHITE", disabled, ...rest }, ref) => {
+		const checkObject = typeof value === "object" && !Array.isArray(value) && value !== null;
 
-	return checkObject ? (
-		<InputMultiple value={value} {...rest} ref={ref} />
-	) : (
-		<InputSingle value={value} {...rest} ref={ref} />
-	);
-};
+		const onChange = e => {
+			let value = e.target.value;
+			if (checkObject) {
+				setValue(prevState => {
+					return {
+						...prevState,
+						[name]: value,
+					};
+				});
+			} else {
+				setValue(value);
+			}
+		};
 
-export default forwardRef(Input);
+		const getValue = () => {
+			if (checkObject) return value[name] || "";
+			else return value || "";
+		};
+
+		switch (type) {
+			case "textarea":
+				return (
+					<textarea
+						value={getValue()}
+						onChange={onChange}
+						style={{ width, height }}
+						name={name}
+						disabled={disabled}
+						className={`${styles.input} ${styles.textarea} ${styles[theme]} ${className ?? ""}`}
+						ref={ref}
+						{...rest}
+					/>
+				);
+			default:
+				return (
+					<input
+						value={getValue()}
+						onChange={onChange}
+						style={{ width, height }}
+						name={name}
+						type={type}
+						disabled={disabled}
+						className={`${styles.input} ${styles[theme]} ${className ?? ""}`}
+						ref={ref}
+						{...rest}
+					/>
+				);
+		}
+	}
+);
+
+export default Input;

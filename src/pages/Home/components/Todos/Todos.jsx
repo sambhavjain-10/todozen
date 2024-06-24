@@ -8,7 +8,6 @@ import styles from "./Todos.module.scss";
 const Todos = () => {
 	const [todos] = useRecoilState(todosAtom);
 	const category = useRecoilValue(activeAtom).category;
-	const [showDelete, setshowDelete] = useState(false);
 
 	return (
 		<div className={styles.container}>
@@ -17,25 +16,23 @@ const Todos = () => {
 				mode="virtual"
 				renderClone={(provided, snapshot, rubric) => (
 					<div {...provided.draggableProps} {...provided.dragHandleProps} ref={provided.innerRef}>
-						<Todo
-							key={todos[category][rubric.source.index].id}
-							todo={todos[category][rubric.source.index]}
-							showDelete={showDelete}
-						/>
+						<Todo key={todos[category][rubric.source.index].id} todo={todos[category][rubric.source.index]} />
 					</div>
 				)}
 			>
 				{provided => (
 					<div ref={provided.innerRef} {...provided.droppableProps}>
-						{todos[category]?.map((todo, index) => (
-							<Draggable key={todo.id} draggableId={todo.id} index={index}>
-								{provided => (
-									<div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-										<Todo key={todo.id} todo={todo} showDelete={showDelete} />
-									</div>
-								)}
-							</Draggable>
-						))}
+						{[...(todos[category] || [])]
+							// ?.sort((a, b) => (a.checked ? 1 : -1))
+							?.map((todo, index) => (
+								<Draggable key={todo.id} draggableId={todo.id} index={index}>
+									{provided => (
+										<div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+											<Todo key={todo.id} todo={todo} />
+										</div>
+									)}
+								</Draggable>
+							))}
 					</div>
 				)}
 			</Droppable>

@@ -2,11 +2,12 @@ import { activeAtom, categoriesAtom, todosAtom } from "@atoms";
 import { Input } from "@components";
 import { InputThemes } from "@themes";
 import { getRandomColor, getTextColor } from "@utils";
-import { useRef, useState } from "react";
+import { useContext, useRef, useState } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
 import styles from "./Categories.module.scss";
-import { Droppable } from "react-beautiful-dnd";
+import { Draggable, Droppable } from "react-beautiful-dnd";
 import { Delete, Plus } from "@icons";
+import { AlertContext } from "@contexts";
 
 const dummyCategory = () => ({
 	id: crypto.randomUUID(),
@@ -17,6 +18,8 @@ const dummyCategory = () => ({
 const Categories = () => {
 	const inputRef = useRef(null);
 	const inputRef2 = useRef(null);
+
+	const { addConfirmMessage } = useContext(AlertContext);
 	//atom states
 	const [categories, setCategories] = useRecoilState(categoriesAtom);
 	const [todos, setTodos] = useRecoilState(todosAtom);
@@ -69,60 +72,87 @@ const Categories = () => {
 		setIsEdit(false);
 	};
 
-	const onDelete = id => setCategories(prev => prev.filter(cat => cat.id !== id));
+	const onDeleteCategory = id => {
+		addConfirmMessage({
+			msg: "Delete category with Todo's?",
+			acceptFunc: () => {
+				setCategories(prev => prev.filter(cat => cat.id !== id));
+				setTodos(prev => {
+					const newTodos = { ...prev };
+					delete newTodos[id];
+					return newTodos;
+				});
+				if (active.category === id) {
+					setActive(prev => ({ ...prev, category: null }));
+				}
+			},
+		});
+	};
 
 	const setCategoryName = val => setTempCategory(prev => ({ ...prev, name: val }));
 
 	return (
 		<div className={styles.container}>
 			<div className={styles.categories}>
-				{categories.map(cat => (
-					<Droppable droppableId={JSON.stringify({ type: "category", id: cat.id })} key={cat.id}>
-						{provided => (
-							<div ref={provided.innerRef} {...provided.droppableProps} className={styles.categories}>
-								<span
-									style={{ borderColor: cat.background, ...(active.category === cat.id && { background: cat.background }) }}
-									className={`${styles.category} ${active.category === cat.id ? styles.active : ""}`}
-									onClick={() => onCategoryClick(cat.id)}
-									onDoubleClick={() => onEditCategory(cat)}
-									onBlur={onEditBlur}
-								>
-									{isEdit === cat.id ? (
-										<Input
-											theme={InputThemes.TRANSPARENT}
-											value={tempCategory.name}
-											setValue={val => setCategoryName(val)}
-											style={{
-												color: getTextColor(tempCategory.background),
-												width: `calc(${tempCategory.name.length * 6}px + 20px)`,
-											}}
-											height="fit-content"
-											onKeyDown={e => e.key === "Enter" && onEditBlur()}
-											ref={inputRef}
-										/>
-									) : (
-										<div className={styles.info}>
-											<span className={styles.name} style={{ color: cat.background }}>
-												{cat.name}
-											</span>
+				<Droppable droppableId="categories" direction="horizontal">
+					{provided => (
+						<div ref={provided.innerRef} {...provided.droppableProps} className={styles.categories}>
+							{categories.map((cat, index) => (
+								<Draggable key={cat.id} draggableId={cat.id} index={index}>
+									{provided => (
+										<div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
 											<span
-												className={styles.count}
-												style={{ background: cat.background, ...(active.category === cat.id && { color: cat.background }) }}
+												style={{
+													borderColor: cat.background,
+													...(active.category === cat.id && { background: cat.background }),
+												}}
+												className={`${styles.category} ${active.category === cat.id ? styles.active : ""}`}
+												onClick={() => onCategoryClick(cat.id)}
+												onDoubleClick={() => onEditCategory(cat)}
+												onBlur={onEditBlur}
 											>
-												{todos[cat.id]?.length ?? 0}
+												{isEdit === cat.id ? (
+													<Input
+														theme={InputThemes.TRANSPARENT}
+														value={tempCategory.name}
+														setValue={val => setCategoryName(val)}
+														style={{
+															color: getTextColor(tempCategory.background),
+															width: `calc(${tempCategory.name.length * 6}px + 20px)`,
+														}}
+														height="fit-content"
+														onKeyDown={e => e.key === "Enter" && onEditBlur()}
+														ref={inputRef}
+													/>
+												) : (
+													<div className={styles.info}>
+														<span className={styles.name} style={{ color: cat.background }}>
+															{cat.name}
+														</span>
+														<span
+															className={styles.count}
+															style={{
+																background: cat.background,
+																...(active.category === cat.id && { color: cat.background }),
+															}}
+														>
+															{todos[cat.id]?.length ?? 0}
+														</span>
+													</div>
+												)}
+												<button className={styles.deleteBtn} onClick={() => onDeleteCategory(cat.id)}>
+													<Delete size="1.2rem" />
+												</button>
 											</span>
+											{provided.placeholder}
 										</div>
 									)}
-									<button className={styles.deleteBtn} onClick={() => onDelete(cat.id)}>
-										<Delete size="1rem" />
-									</button>
-								</span>
-								{provided.placeholder}
-							</div>
-						)}
-					</Droppable>
-				))}
-				{isAdd ? (
+								</Draggable>
+							))}
+						</div>
+					)}
+				</Droppable>
+				{isAdd && (
 					<span
 						style={{
 							background: tempCategory.background,
@@ -145,12 +175,11 @@ const Categories = () => {
 							ref={inputRef2}
 						/>
 					</span>
-				) : (
-					<button onClick={onAddNewCategory} className={styles.addBtn}>
-						<Plus size="1.2rem" />
-					</button>
 				)}
 			</div>
+			<button onClick={onAddNewCategory} className={styles.addBtn}>
+				<Plus size="1.2rem" />
+			</button>
 		</div>
 	);
 };

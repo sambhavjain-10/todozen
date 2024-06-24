@@ -1,5 +1,7 @@
 import Icon from './Icon';
 
+export const Caution = props => <Icon {...props} name="caution" />;
+export const Close = props => <Icon {...props} name="close" />;
 export const Delete = props => <Icon {...props} name="delete" />;
 export const Edit = props => <Icon {...props} name="edit" />;
 export const Home = props => <Icon {...props} name="home" />;

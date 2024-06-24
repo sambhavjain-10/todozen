@@ -2,19 +2,19 @@
 
 .container {
 	padding: 15px 0;
-	overflow: scroll;
-	&::-webkit-scrollbar {
-		display: none;
-	}
-	.title {
-		color: #8a8a8a;
-		margin-bottom: 10px;
-	}
+	position: relative;
+	display: flex;
+	align-items: center;
+	gap: 10px;
 	.categories {
+		&::-webkit-scrollbar {
+			display: none;
+		}
 		display: flex;
 		align-items: center;
 		gap: 10px;
-		width: fit-content;
+		overflow: scroll;
+		position: relative;
 		.category {
 			display: flex;
 			align-items: center;
@@ -59,44 +59,45 @@
 			}
 			//temp
 			.deleteBtn {
-				position: absolute;
-				right: -13px;
-				top: -13px;
+				// position: absolute;
+				// right: -13px;
+				// top: 50%;
+				transform: translateX(4px);
 				border: none;
 				background: none;
 				font-size: 1.2rem;
 				width: 18px;
 				height: 22px;
-				opacity: 0;
+				// opacity: 0;
 				transition: 0.5s;
-				color: red;
-				border: 1px solid #8a8a8a;
+				color: white;
+				// border: 1px solid #8a8a8a;
 				border-radius: 50%;
-				display: flex;
 				align-items: center;
 				justify-content: center;
+				display: none;
 			}
-			&:hover .deleteBtn {
-				opacity: 1;
+			&.active:hover .deleteBtn {
+				display: flex;
 			}
 		}
-		.addBtn {
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			border-radius: 50%;
-			border: none;
-			box-shadow: 1px 1px 8px 0px rgba(0, 0, 0, 0.1);
-			width: 25px;
-			height: 25px;
-			cursor: pointer;
-			transition: 0.5s;
-			background: $blue;
-			color: $white;
-			opacity: 0.2;
-			&:hover {
-				opacity: 1;
-			}
+	}
+	.addBtn {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border-radius: 50%;
+		border: none;
+		box-shadow: 1px 1px 8px 0px rgba(0, 0, 0, 0.1);
+		min-width: 25px;
+		height: 25px;
+		cursor: pointer;
+		transition: 0.5s;
+		background: $blue;
+		color: $white;
+		opacity: 0.2;
+		&:hover {
+			opacity: 1;
 		}
 	}
 }
