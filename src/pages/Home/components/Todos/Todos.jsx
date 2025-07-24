@@ -27,12 +27,18 @@ const Todos = () => {
 							?.map((todo, index) => (
 								<Draggable key={todo.id} draggableId={todo.id} index={index}>
 									{provided => (
-										<div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+										<div
+											ref={provided.innerRef}
+											{...provided.draggableProps}
+											{...provided.dragHandleProps}
+											style={{ margin: "10px 0", minHeight: "40px" }}
+										>
 											<Todo key={todo.id} todo={todo} />
 										</div>
 									)}
 								</Draggable>
 							))}
+						{provided.placeholder}
 					</div>
 				)}
 			</Droppable>
