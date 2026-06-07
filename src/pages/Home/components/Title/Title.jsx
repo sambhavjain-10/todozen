@@ -1,11 +1,12 @@
 import { activeAtom, settingsAtom, todosAtom } from "@atoms";
 import { Input } from "@components";
 import { InputThemes } from "@themes";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useContext } from "react";
 import { useRecoilState } from "recoil";
 import styles from "./Title.module.scss";
-import { Settings, ThreeDot } from "@icons";
+import { Settings, ThreeDot, Delete } from "@icons";
 import { PAGES } from "@constants";
+import { AlertContext } from "@contexts";
 
 const SortIcon = props => (
 	<svg
@@ -25,6 +26,22 @@ const SortIcon = props => (
 	</svg>
 );
 
+const CopyIcon = props => (
+	<svg
+		viewBox="0 0 24 24"
+		fill="none"
+		stroke="currentColor"
+		strokeWidth="2.5"
+		strokeLinecap="round"
+		strokeLinejoin="round"
+		style={{ width: "1.1rem", height: "1.1rem" }}
+		{...props}
+	>
+		<rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+		<path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+	</svg>
+);
+
 const Title = () => {
 	const titleRef = useRef(null);
 	const menuRef = useRef(null);
@@ -33,6 +50,7 @@ const Title = () => {
 	const [todos, setTodos] = useRecoilState(todosAtom);
 	const [editTitle, setEditTitle] = useState(false);
 	const [showDropdown, setShowDropdown] = useState(false);
+	const { addConfirmMessage, addSuccess } = useContext(AlertContext);
 
 	useEffect(() => {
 		if (editTitle) titleRef.current.focus();
@@ -74,6 +92,37 @@ const Title = () => {
 		});
 	};
 
+	const copyPendingTodos = () => {
+		if (!active.category || !todos[active.category]) return;
+		const pending = todos[active.category].filter(todo => !todo.checked);
+		if (pending.length === 0) return;
+		const text = pending.map(todo => `-${todo.title}`).join("\n");
+		navigator.clipboard.writeText(text).then(() => {
+			addSuccess("Pending todos copied!");
+		});
+	};
+
+	const deleteCompletedTodos = () => {
+		if (!active.category || !todos[active.category]) return;
+		const completedCount = todos[active.category].filter(todo => todo.checked).length;
+		if (completedCount === 0) return;
+
+		addConfirmMessage({
+			msg: `Delete ${completedCount} completed todo${completedCount > 1 ? "s" : ""}?`,
+			acceptFunc: () => {
+				setTodos(prev => ({
+					...prev,
+					[active.category]: (prev[active.category] || []).filter(todo => !todo.checked),
+				}));
+				addSuccess("Completed todos deleted!");
+			},
+		});
+	};
+
+	const hasPending = active.category && todos[active.category] && todos[active.category].some(todo => !todo.checked);
+	const hasCompleted = active.category && todos[active.category] && todos[active.category].some(todo => todo.checked);
+	const hasTodos = active.category && todos[active.category] && todos[active.category].length > 0;
+
 	return (
 		<div className={styles.title}>
 			{editTitle ? (
@@ -107,10 +156,32 @@ const Title = () => {
 								setShowDropdown(false);
 							}}
 							className={styles.dropdownItem}
-							disabled={!active.category || !todos[active.category] || todos[active.category].length === 0}
+							disabled={!hasTodos}
 						>
 							<SortIcon />
 							<span>Sort Todos</span>
+						</button>
+						<button
+							onClick={() => {
+								copyPendingTodos();
+								setShowDropdown(false);
+							}}
+							className={styles.dropdownItem}
+							disabled={!hasPending}
+						>
+							<CopyIcon />
+							<span>Copy Pending</span>
+						</button>
+						<button
+							onClick={() => {
+								deleteCompletedTodos();
+								setShowDropdown(false);
+							}}
+							className={`${styles.dropdownItem} ${styles.danger}`}
+							disabled={!hasCompleted}
+						>
+							<Delete size="1.1rem" />
+							<span>Delete Completed</span>
 						</button>
 						<button
 							onClick={() => {
